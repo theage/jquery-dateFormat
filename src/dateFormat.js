@@ -101,6 +101,10 @@ var DateFormat = {};
       return value;
     }
 
+    function dummyLocalizeCallback(text) {
+      return text;
+    }
+
     return {
 
       parseDate: function(value) {
@@ -195,8 +199,12 @@ var DateFormat = {};
         return parsedDate;
       },
 
-      date : function(value, format) {
+      date : function(value, format, localizeCallback) {
         try {
+          if (!localizeCallback) {
+            localizeCallback = dummyLocalizeCallback;
+          }
+
           var parsedDate = this.parseDate(value);
 
           if(parsedDate === null) {
@@ -235,7 +243,7 @@ var DateFormat = {};
             unparsedRest = '';
             switch (pattern) {
               case 'ddd':
-                retValue += numberToLongDay(dayOfWeek);
+                retValue += localizeCallback(numberToLongDay(dayOfWeek));
                 pattern = '';
                 break;
               case 'dd':
@@ -266,14 +274,14 @@ var DateFormat = {};
                 pattern = '';
                 break;
               case 'MMMM':
-                retValue += numberToLongMonth(month);
+                retValue += localizeCallback(numberToLongMonth(month));
                 pattern = '';
                 break;
               case 'MMM':
                 if(nextRight === 'M') {
                   break;
                 }
-                retValue += numberToShortMonth(month);
+                retValue += localizeCallback(numberToShortMonth(month));
                 pattern = '';
                 break;
               case 'MM':
@@ -382,7 +390,7 @@ var DateFormat = {};
                 pattern = '';
                 break;
               case 'E':
-                retValue += numberToShortDay(dayOfWeek);
+                retValue += localizeCallback(numberToShortDay(dayOfWeek));
                 pattern = '';
                 break;
               case "'":
@@ -460,8 +468,8 @@ var DateFormat = {};
           return 'more than 5 weeks ago';
         }
       },
-      toBrowserTimeZone : function(value, format) {
-        return this.date(new Date(value), format || 'MM/dd/yyyy HH:mm:ss');
+      toBrowserTimeZone : function(value, format, localizeCallback) {
+        return this.date(new Date(value), format || 'MM/dd/yyyy HH:mm:ss', localizeCallback);
       }
     };
   }());

@@ -101,6 +101,10 @@ var DateFormat = {};
       return value;
     }
 
+    function dummyLocalizeCallback(text) {
+      return text;
+    }
+
     return {
 
       parseDate: function(value) {
@@ -124,7 +128,7 @@ var DateFormat = {};
           // => Thu Feb 01 1900 00:00:00
           parsedDate.month      = String(value.getMonth() + 1);
           parsedDate.dayOfMonth = String(value.getDate());
-          parsedDate.time       = parseTime(value.toTimeString() + "." + value.getMilliseconds());
+          parsedDate.time       = parseTime(value.toTimeString() + '.' + value.getMilliseconds());
         } else if(value.search(YYYYMMDD_MATCHER) != -1) {
           /* 2009-04-19T16:11:05+02:00 || 2009-04-19T16:11:05Z */
           values = value.split(/[T\+-]/);
@@ -195,8 +199,12 @@ var DateFormat = {};
         return parsedDate;
       },
 
-      date : function(value, format) {
+      date : function(value, format, localizeCallback) {
         try {
+          if (!localizeCallback) {
+            localizeCallback = dummyLocalizeCallback;
+          }
+
           var parsedDate = this.parseDate(value);
 
           if(parsedDate === null) {
@@ -235,7 +243,7 @@ var DateFormat = {};
             unparsedRest = '';
             switch (pattern) {
               case 'ddd':
-                retValue += numberToLongDay(dayOfWeek);
+                retValue += localizeCallback(numberToLongDay(dayOfWeek));
                 pattern = '';
                 break;
               case 'dd':
@@ -266,14 +274,14 @@ var DateFormat = {};
                 pattern = '';
                 break;
               case 'MMMM':
-                retValue += numberToLongMonth(month);
+                retValue += localizeCallback(numberToLongMonth(month));
                 pattern = '';
                 break;
               case 'MMM':
                 if(nextRight === 'M') {
                   break;
                 }
-                retValue += numberToShortMonth(month);
+                retValue += localizeCallback(numberToShortMonth(month));
                 pattern = '';
                 break;
               case 'MM':
@@ -370,8 +378,7 @@ var DateFormat = {};
                 pattern = '';
                 break;
               case 'SSS':
-                var sss = '000' + time.millis.substring(0, 3);
-                retValue +=  sss.substring(sss.length - 3);
+                retValue +=  padding(time.millis.substring(0, 3), 3);
                 pattern = '';
                 break;
               case 'a':
@@ -383,7 +390,7 @@ var DateFormat = {};
                 pattern = '';
                 break;
               case 'E':
-                retValue += numberToShortDay(dayOfWeek);
+                retValue += localizeCallback(numberToShortDay(dayOfWeek));
                 pattern = '';
                 break;
               case "'":
@@ -461,8 +468,8 @@ var DateFormat = {};
           return 'more than 5 weeks ago';
         }
       },
-      toBrowserTimeZone : function(value, format) {
-        return this.date(new Date(value), format || 'MM/dd/yyyy HH:mm:ss');
+      toBrowserTimeZone : function(value, format, localizeCallback) {
+        return this.date(new Date(value), format || 'MM/dd/yyyy HH:mm:ss', localizeCallback);
       }
     };
   }());
