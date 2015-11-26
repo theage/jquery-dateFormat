@@ -1,48 +1,39 @@
 var DateFormat = {};
 
 (function($) {
-  var daysInWeek          = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  var shortDaysInWeek     = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  var shortMonthsInYear   = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                              'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  var longMonthsInYear    = ['January', 'February', 'March', 'April', 'May', 'June',
-                              'July', 'August', 'September', 'October', 'November', 'December'];
-  var shortMonthsToNumber = { 'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
-                              'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12' };
-
   var YYYYMMDD_MATCHER = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.?\d{0,3}[Z\-+]?(\d{2}:?\d{2})?/;
 
   $.format = (function() {
     function numberToLongDay(value) {
       // 0 to Sunday
       // 1 to Monday
-      return daysInWeek[parseInt(value, 10)] || value;
+      return obj.options.daysInWeek[parseInt(value, 10)] || value;
     }
 
     function numberToShortDay(value) {
       // 0 to Sun
       // 1 to Mon
-      return shortDaysInWeek[parseInt(value, 10)] || value;
+      return obj.options.shortDaysInWeek[parseInt(value, 10)] || value;
     }
 
     function numberToShortMonth(value) {
       // 1 to Jan
       // 2 to Feb
       var monthArrayIndex = parseInt(value, 10) - 1;
-      return shortMonthsInYear[monthArrayIndex] || value;
+      return obj.options.shortMonthsInYear[monthArrayIndex] || value;
     }
 
     function numberToLongMonth(value) {
       // 1 to January
       // 2 to February
       var monthArrayIndex = parseInt(value, 10) - 1;
-      return longMonthsInYear[monthArrayIndex] || value;
+      return obj.options.longMonthsInYear[monthArrayIndex] || value;
     }
 
     function shortMonthToNumber(value) {
       // Jan to 01
       // Feb to 02
-      return shortMonthsToNumber[value] || value;
+      return obj.options.shortMonthsToNumber[value] || value;
     }
 
     function parseTime(value) {
@@ -92,7 +83,6 @@ var DateFormat = {};
       return { time : '', hour : '', minute : '', second : '', millis : '' };
     }
 
-
     function padding(value, length) {
       var paddingCount = length - String(value).length;
       for(var i = 0; i < paddingCount; i++) {
@@ -101,9 +91,26 @@ var DateFormat = {};
       return value;
     }
 
-    return {
+    var obj = {
 
-      parseDate: function(value) {
+      options: {
+        daysInWeek          : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        shortDaysInWeek     : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        shortMonthsInYear   : [
+          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        ],
+        longMonthsInYear    : [
+          'January', 'February', 'March', 'April', 'May', 'June',
+          'July', 'August', 'September', 'October', 'November', 'December'
+        ],
+        shortMonthsToNumber : {
+          'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
+          'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+        };
+      },
+
+    parseDate: function(value) {
         var values,
             subValues;
 
@@ -464,5 +471,7 @@ var DateFormat = {};
         return this.date(new Date(value), format || 'MM/dd/yyyy HH:mm:ss');
       }
     };
+
+    return obj;
   }());
 }(DateFormat));
